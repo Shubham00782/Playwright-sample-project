@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+env/
+.pytest_cache/
+.tox/
+.coverage
+htmlcov/
+.env
+
+# Playwright / Test Reports
+test-results/
+playwright-report/
+report.html
+junit.xml
+
+# Allure Reports and Traces
+reports/
+allure-results/
+allure-report/
+
+# Log Files
+*.log
+logs/
+
+# Optional: Ignore local environment configs if you ever create them
+config/config.local.ini
