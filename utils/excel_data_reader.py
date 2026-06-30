@@ -67,3 +67,28 @@ class ExcelUtils:
         sheet = workbook[sheet]
         sheet[cell_chords].value = data
         workbook.save(files)
+
+    @staticmethod
+    def get_excel_data(files, sheet_name):
+        workbook = openpyxl.load_workbook(files)
+        sheet = workbook[sheet_name]
+
+        data = []
+
+        headers = [
+            sheet.cell(row=1, column=col).value
+            for col in range(1, sheet.max_column + 1)
+        ]
+
+        for row in range(2, sheet.max_row + 1):
+            row_data = {}
+
+            for col in range(1, sheet.max_column + 1):
+                row_data[headers[col - 1]] = sheet.cell(
+                    row=row,
+                    column=col
+                ).value
+
+            data.append(row_data)
+
+        return data

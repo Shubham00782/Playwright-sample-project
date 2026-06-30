@@ -5,6 +5,7 @@ from playwright.sync_api import sync_playwright
 import logging
 import argparse
 from utils.config_reader import ConfigReader
+from datetime import datetime
 
 """
 ---------------------------------------------------------
@@ -41,7 +42,7 @@ def pytest_addoption(parser):
     except (ValueError, argparse.ArgumentError):
         pass
     try:
-        parser.addoption("--tracing", default="retain=on-failure", help="Tracing: on, off, retain-on-failure")
+        parser.addoption("--tracing", default="retain-on-failure", help="Tracing: on, off, retain-on-failure")
     except (ValueError, argparse.ArgumentError):
         pass
 
@@ -145,7 +146,7 @@ def page(request, browser_context):
     logging.info(f"Navigating to: {base_url}")
 
     # Start tracing if enabled
-    if tracing_option == ["on", "retain-on-failure"]:
+    if tracing_option in ["on", "retain-on-failure"]:
         logging.info("Tracing enabled - capturing screenshots and actions")
         browser_context.tracing.start(screenshots=True, snapshots=True, sources=True)
 
@@ -163,7 +164,7 @@ def page(request, browser_context):
     logging.info(f"Test name: {test_name}, result: {'Failed' if test_failed else 'Passed'}")
 
     # Save and attach trace
-    if tracing_option == ["on", "retain-on-failure"]:
+    if tracing_option in ["on", "retain-on-failure"]:
         trace_path = f"reports/traces/{test_name}_trace.zip"
         browser_context.tracing.stop(path=trace_path)
         logging.info(f"Trace Saved: {trace_path}")
@@ -172,7 +173,11 @@ def page(request, browser_context):
 
     # Take Screenshots if test failed
     if test_failed and screenshot_option in ["on", "only-on-failure"]:
-        screenshot_path = f"reports/screenshots/{test_name}_screenshot.png"
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        screenshot_path = (
+            f"reports/screenshots/"
+            f"{test_name}_{timestamp}.png"
+        )
         page.screenshot(path=screenshot_path)
         logging.info(f"Screenshot saved: {screenshot_path}")
 
@@ -185,7 +190,7 @@ def page(request, browser_context):
         logging.info(f"Screenshot attached to allure: {screenshot_path}")
 
     # Attach video, if available and test failed
-    if test_failed and video_option in ["on", "only-on-failure"]:
+    if test_failed and video_option in ["on", "retain-on-failure"]:
         video_path = page.video.path() if page.video else None
         if video_path and Path(video_path).exists():
             allure.attach.file(

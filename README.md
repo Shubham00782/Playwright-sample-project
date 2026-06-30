@@ -100,7 +100,8 @@ This will process the data and automatically open the report in your default web
 
 ```text
 ├── config/                  # Configuration files
-│   └── config.ini           # Stores environment variables like base_url
+│   ├── config.ini           # Stores environment variables like base_url
+│   └── .env                 # Stores Credentials
 ├── locators/                # UI Element Selectors (separated by page)
 ├── pages/                   # Page Object classes (methods/actions for UI)
 ├── reports/                 # Output directory for test artifacts

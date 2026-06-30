@@ -11,6 +11,7 @@ env/
 .coverage
 htmlcov/
 .env
+.idea
 
 # Playwright / Test Reports
 test-results/
