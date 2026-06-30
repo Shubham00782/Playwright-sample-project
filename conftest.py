@@ -200,3 +200,38 @@ def page(request, browser_context):
             )
             logging.info("Video attached to allure report}")
 
+
+# STEP 6: FIXTURE 3 - API REQUEST CONTEXT
+@pytest.fixture(scope="function")
+def api_context(request):
+    """
+    Creates a Playwright APIRequestContext pre-configured with the API base URL.
+
+    Usage (inside a test):
+        def test_something(self, api_context):
+            response = api_context.get("/booking")
+
+    The base URL is read from config.ini [API] > base_url_api so that
+    individual tests only need to pass the path, not the full URL.
+
+    The context is automatically disposed after every test.
+    """
+    base_url_api = ConfigReader.read_config("API", "base_url_api")
+    logging.info(f"Creating API context with base URL: {base_url_api}")
+
+    playwright = sync_playwright().start()
+
+    # Create an API request context (no browser needed)
+    # ignore_https_errors=True handles corporate proxies / self-signed certs
+    context = playwright.request.new_context(
+        base_url=base_url_api,
+        ignore_https_errors=True,
+        extra_http_headers={"Content-Type": "application/json", "Accept": "application/json"}
+    )
+
+    yield context
+
+    # Dispose the context and stop playwright after each test
+    logging.info("Disposing API context and stopping Playwright...")
+    context.dispose()
+    playwright.stop()
